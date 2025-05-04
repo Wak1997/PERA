@@ -1,383 +1,252 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Self-Assessment Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Punjab Enforcement and Regulation Act 2024 Guide</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: Arial, sans-serif;
             line-height: 1.6;
+            margin: 0;
+            background-color: #f4f4f4;
         }
-
         .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        button {
-            display: block;
+            max-width: 800px;
             margin: 20px auto;
-            padding: 12px 24px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .container.active {
+            display: block;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #444;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #555;
+        }
+        p, ul {
+            color: #333;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .social-link {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .social-link:hover {
+            text-decoration: underline;
+        }
+        .welcome {
+            text-align: center;
+        }
+        .welcome h1 {
+            font-size: 2em;
+        }
+        .welcome p {
+            font-size: 1.2em;
+        }
+        .question-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        .final-message {
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .nav-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-button button {
+            padding: 10px 20px;
             background-color: #007BFF;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.2s;
+            font-size: 1em;
         }
-
-        button:hover {
+        .nav-button button:hover {
             background-color: #0056b3;
-            transform: scale(1.05);
         }
-
-        button:disabled {
+        .nav-button button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
-            transform: none;
-        }
-
-        #welcome {
-            background: linear-gradient(to bottom, #e3f2fd, #ffffff);
-        }
-
-        #welcome p, #welcome ul {
-            margin-bottom: 15px;
-        }
-
-        #welcome ul ul {
-            margin-left: 20px;
-        }
-
-        #welcome a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-
-        #welcome a:hover {
-            text-decoration: underline;
-        }
-
-        #quiz {
-            position: relative;
-        }
-
-        #progress-bar {
-            height: 5px;
-            background-color: #ddd;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        #progress {
-            height: 100%;
-            background-color: #4CAF50;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        #question-number {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .option {
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .option:hover {
-            background-color: #f0f0f0;
-        }
-
-        .option.selected[data-choice="A"] {
-            background-color: #4CAF50;
-            color: #fff;
-            border-color: #4CAF50;
-        }
-
-        .option.selected[data-choice="B"] {
-            background-color: #F44336;
-            color: #fff;
-            border-color: #F44336;
-        }
-
-        .option.selected[data-choice="C"] {
-            background-color: #9E9E9E;
-            color: #fff;
-            border-color: #9E9E9E;
-        }
-
-        #results p {
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        #results span {
-            font-weight: 600;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 15px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-            h2 {
-                font-size: 20px;
-            }
-            button {
-                padding: 15px 30px;
-                font-size: 18px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Welcome Page -->
-    <div id="welcome" class="container">
-        <h1>Welcome to Self-Assessment</h1>
-        <p>PERA-PPSC PAPER Held on 16-03-2025</p>
-        <h2>Instructions:</h2>
+    <!-- Page 1: Welcome Page -->
+    <div class="container active" id="page1">
+        <div class="welcome">
+            <h1>Punjab Enforcement and Regulation Act 2024 </h1>
+            <p>Authored by: <strong>Adv. Wajid Ali Kharal</strong></p>
+            <p><a class="social-link" href="https://m.facebook.com/WaK1997" target="_blank">Follow on Facebook</a></p>
+        </div>
+        <h2>Questions Covered</h2>
+        <ol class="question-list">
+            <li>Where does the second appeal lie after an unsuccessful representation before the Hearing Officer?</li>
+            <li>Who has the power to register an FIR?</li>
+            <li>Who has the authority to arrest a person?</li>
+        </ol>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next Page</button>
+        </div>
+    </div>
+
+    <!-- Page 2: Question 1 -->
+    <div class="container" id="page2">
+        <h1>Punjab Enforcement and Regulation Act 2024 (PERA Act)</h1>
+        <h2>Question 1: Where does the second appeal lie after an unsuccessful representation before the Hearing Officer?</h2>
+        <h3>Answer:</h3>
+        <p>The second appeal lies before the <strong>Court of Session or Additional Sessions Judge</strong>.</p>
+        <h3>Explanation:</h3>
         <ul>
-            <li>The quiz consists of multiple-choice questions (MCQs).</li>
-            <li>Each question has three options:
+            <li>After an unsuccessful representation before the Hearing Officer, the aggrieved party can appeal to the Commissioner of the concerned Division (first appeal). If still aggrieved, they can file a second appeal to the Court of Session or Additional Sessions Judge, as defined in <strong>Section 2(i)</strong> and governed by <strong>Section 52(3)</strong> of the PERA Act.</li>
+            <li><strong>Section 52(1)</strong>: Allows the first appeal to the Commissioner.</li>
+            <li><strong>Section 52(3)</strong>: Allows the second appeal to the Court (Court of Session or Additional Sessions Judge).</li>
+            <li>The PERA Act’s appeal mechanism takes precedence over other laws, as per <strong>Section 77</strong>, and no further appeal is provided beyond the Court of Session.</li>
+        </ul>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next Page</button>
+        </div>
+    </div>
+
+    <!-- Page 3: Question 2 -->
+    <div class="container" id="page3">
+        <h1>Punjab Enforcement and Regulation Act 2024 (PERA Act)</h1>
+        <h2>Question 2: Who has the power to register an FIR?</h2>
+        <h3>Answer:</h3>
+        <p>The <strong>Sub Divisional Enforcement Officer (SDEO)</strong> has the power to register an FIR under the PERA Act.</p>
+        <h3>Explanation:</h3>
+        <ul>
+            <li><strong>Section 22(4)(f)</strong>: Empowers the Sub Divisional Enforcement Officer to "register FIRs and conduct investigations."</li>
+            <li><strong>Section 49(2)</strong>: Specifies scenarios where the Sub Divisional Enforcement Officer can register an FIR, including directly or based on reports from other officers.</li>
+            <li>While the Enforcement Officer and Investigation Officer can file complaints, the actual registration of the FIR is performed by the Sub Divisional Enforcement Officer.</li>
+            <li>The Enforcement Station, not a police station, is the designated entity for FIR registration under the Act, as per <strong>Section 19</strong>.</li>
+        </ul>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next Page</button>
+        </div>
+    </div>
+
+    <!-- Page 4: Question 3 -->
+    <div class="container" id="page4">
+        <h1>Punjab Enforcement and Regulation Act 2024 (PERA Act)</h1>
+        <h2>Question 3: Who has the authority to arrest a person?</h2>
+        <h3>Answer:</h3>
+        <p>The following officers have the authority to arrest a person under the PERA Act:</p>
+        <ul>
+            <li><strong>Sub Divisional Enforcement Officer (SDEO)</strong></li>
+            <li><strong>Enforcement Officer (EO)</strong></li>
+            <li><strong>Investigation Officer (IO)</strong></li>
+        </ul>
+        <h3>Explanation:</h3>
+        <ul>
+            <li><strong>Section 31(1)</strong>: Explicitly grants arrest powers to these officers under specific conditions, such as involvement in an offence or obstruction of duties.</li>
+            <li>Supporting sections:
                 <ul>
-                    <li>Option A: Correct answer (+1 mark).</li>
-                    <li>Option B: "Wrong Answer" (-0.25 marks).</li>
-                    <li>Option C: "Unsure or Not Attempted" (0 marks, no deduction).</li>
+                    <li><strong>Section 22(4)(f)</strong>: Confirms the Sub Divisional Enforcement Officer (SDEO) arrest authority.</li>
+                    <li><strong>Section 23(4)(viii)</strong>: Grants the Enforcement Officer (EO) arrest powers.</li>
+                    <li><strong>Section 26(3)(f)</strong>: Confirms the Investigation Officer (IO) arrest powers.</li>
                 </ul>
             </li>
-            <li>You must select one option per question before proceeding.</li>
-            <li>At the end of the quiz, your score breakdown will be displayed.</li>
-            <li>Click "Start Quiz" to begin the test.</li>
+            <li><strong>Section 32</strong>: Requires the arresting officer to present the person at the Enforcement Station and produce them before a Magistrate within 24 hours.</li>
+            <li>The CrPC’s arrest procedures apply where not inconsistent with the PERA Act, as per <strong>Section 33</strong>.</li>
         </ul>
-        <p>Created By: Adv. Wajid Ali Kharal</p>
-        <p>Follow me on Facebook: <a href="https://web.facebook.com/WaK1997" target="_blank">https://web.facebook.com/WaK1997</a></p>
-        <button id="start-btn">Start Quiz</button>
-    </div>
-
-    <!-- Quiz Container -->
-    <div id="quiz" class="container" style="display: none;">
-        <div id="progress-bar"><div id="progress"></div></div>
-        <h2 id="question-number"></h2>
-        <h2 id="question"></h2>
-        <div id="options">
-            <div class="option" data-choice="A"></div>
-            <div class="option" data-choice="B">B. Wrong Answer</div>
-            <div class="option" data-choice="C">C. Unsure or Not Attempted</div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next Page</button>
         </div>
-        <button id="next-btn" disabled>Next</button>
     </div>
 
-    <!-- Results Page -->
-    <div id="results" class="container" style="display: none;">
-        <h2>Quiz Results</h2>
-        <p>Total Questions: <span id="total"></span></p>
-        <p>Correct Answers: <span id="correct"></span></p>
-        <p>Wrong Answers: <span id="wrong"></span></p>
-        <p>Unsure Questions: <span id="unsure"></span></p>
-        <p>Cumulative Score: <span id="score"></span></p>
-        <button id="restart-btn">Restart Quiz</button>
+    <!-- Page 5: Final Message -->
+    <div class="container" id="page5">
+        <div class="final-message">
+            <h1>Best of Luck!</h1>
+            <p>You may follow me on Facebook:</p>
+            <p><a class="social-link" href="https://m.facebook.com/WaK1997" target="_blank">https://m.facebook.com/WaK1997</a></p>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()" disabled>Next Page</button>
+        </div>
     </div>
 
     <script>
-        const questions = [
-            { question: "Who was the first President of Pakistan?", optionA: "Sikandar Mirza" },
-            { question: "Who was the first Chief Minister of Punjab?", optionA: "Iftikhar Hussain Mamdot" },
-            { question: "Who is the first female Judge of the Supreme Court of Pakistan?", optionA: "Ayesha Malik" },
-            { question: "How many princely states joined Pakistan after partition?", optionA: "14" },
-            { question: "What was the first economic war between Pakistan and India?", optionA: "1947-1948" },
-            { question: "What was the agreement between India and Pakistan regarding refugees after partition?", optionA: "Nehru-Liaquat Pact" },
-            { question: "Why did the British annex Punjab?", optionA: "For trade routes" },
-            { question: "What was the impact of colonialism on Punjab?", optionA: "Suppression of local crafts and traditions" },
-            { question: "Which Pakistani poet was nominated for the Nobel Prize?", optionA: "Faiz Ahmad Faiz" },
-            { question: "Which movie won the Oscar for Best Picture in 2022?", optionA: "CODA" },
-            { question: "Who is Ketanji Brown Jackson?", optionA: "US Supreme Court Judge" },
-            { question: "In which state was Donald Trump attacked?", optionA: "Pennsylvania" },
-            { question: "Who is responsible for provincial administration of bureaucracy in Punjab?", optionA: "Chief Secretary" },
-            { question: "How many seats are there in the National Assembly of Pakistan?", optionA: "342" },
-            { question: "What will be the punishment if whistleblowers give false information?", optionA: "Both fine and imprisonment" },
-            { question: "What is the power of PERA regarding regulations?", optionA: "Aligning with the Act and rules" },
-            { question: "What does an Investigation Officer write in the daily diary?", optionA: "Records daily activities" },
-            { question: "What is the required experience for an advocate to become a Supreme Court judge in Pakistan?", optionA: "15 years" },
-            { question: "Under which section of the CrPC is an FIR lodged?", optionA: "Section 154" },
-            { question: "What is the CrPC section for taking security bond for keeping the peace on conviction?", optionA: "Section 106" },
-            { question: "What article of the Constitution of Pakistan 1973 guarantees the Rights of arrested persons to be informed of charges & to get legal representation?", optionA: "Article 10" },
-            { question: "What is the definition of the State as per the 1973 Constitution of Pakistan?", optionA: "\"The State\" means: Federal Government, Majlis-e-Shoora (Parliament), Provincial Governments, Provincial Assemblies, Local or other authorities empowered to impose tax/cess" },
-            { question: "Who built the Badshahi Mosque?", optionA: "Aurangzeb" },
-            { question: "Which industrial special zone has been established in Punjab under the China-Pakistan Economic Corridor (CPEC)?", optionA: "M3 Industrial Zone" },
-            { question: "Which country is the biggest arms provider to Pakistan?", optionA: "China" },
-            { question: "Which fort in Pakistan is a UNESCO World Heritage Site?", optionA: "Rohtas Fort" },
-            { question: "Where is Derawar Fort located?", optionA: "Cholistan Desert" },
-            { question: "Which district contributes the most to Punjab's GDP?", optionA: "Lahore" },
-            { question: "Khunjerab Pass connects Pakistan to which country?", optionA: "China" },
-            { question: "Which is the most fertile region of Punjab?", optionA: "Indus Basin" },
-            { question: "Which winds affect Punjab in winter?", optionA: "Western Disturbances" },
-            { question: "In which year was Rawal Dam constructed?", optionA: "1962" },
-            { question: "When do Parsi celebrate Nowruz?", optionA: "Beginning of the New Year" },
-            { question: "Who discovered malaria?", optionA: "Ronald Ross" },
-            { question: "What causes malaria?", optionA: "Plasmodium" },
-            { question: "Who invented the sewing machine?", optionA: "Elias Howe" },
-            { question: "Where does protein synthesis occur in cells?", optionA: "Ribosomes" },
-            { question: "How many spinal nerves are there in humans?", optionA: "31 pairs" },
-            { question: "What is the blood circulation rate in human capillaries?", optionA: "1 mm/sec" },
-            { question: "Which gland helps in digestion?", optionA: "Pancreas" },
-            { question: "What is the solvent used in soft drinks?", optionA: "Water" },
-            { question: "What is the study of agriculture called?", optionA: "Agronomy" },
-            { question: "What causes the stone cancer to the stones of the Taj Mahal?", optionA: "Acid rain" },
-            { question: "What is the primary cause of deforestation in Punjab?", optionA: "Urbanization and Agriculture" },
-            { question: "What is the current world population?", optionA: "8 billion" },
-            { question: "What are the effects of global warming/climate change?", optionA: "All of the above" },
-            { question: "Which of the following terms is not used in physics?", optionA: "Stock value" },
-            { question: "What is the minimum distance between two points called?", optionA: "Displacement" },
-            { question: "If the one side of a square is 5 cm, what is the area of the square?", optionA: "25 cm²" },
-            { question: "What is the ratio of 2 km to 400 meters?", optionA: "5:1" },
-            { question: "If 1/5th of 3000 keyboards are not working, how many keyboards are working?", optionA: "2400" },
-            { question: "Find the simple interest if principal = $1000, rate = 2%, time = 2 years.", optionA: "$60" },
-            { question: "If y is directly proportional to x², and when x is 2, y is 20, find y when x is 3.", optionA: "45" },
-            { question: "If a tower casts a 20m shadow at a 45-degree elevation, what is the height of the tower?", optionA: "20m" },
-            { question: "If a cosθ + b sinθ = p and a sinθ - b cosθ = q, then what is p² + q²?", optionA: "a² + b²" },
-            { question: "If the point is (2, 3), what is the distance from the x-axis?", optionA: "3 units" },
-            { question: "Three years ago, the average age of a family of 5 members was 17 years. A baby was born, and the average age of the family is the same today. What is the present age of the baby?", optionA: "2 years" },
-            { question: "Fill in the blank: She is confident ___ her ability to succeed.", optionA: "of" },
-            { question: "Sentence correction? 'Let us sit in the shade of trees.'", optionA: "No correction needed" },
-            { question: "Sentence correction? 'She is one of those people who always try to find the positive in every event.'", optionA: "No correction needed" },
-            { question: "Complete the sentence: You are ___ .", optionA: "You are cleverer than he" },
-            { question: "What is the antonym of 'zenith'?", optionA: "Nadir" },
-            { question: "What does 'vulgar' mean?", optionA: "Indecent" },
-            { question: "What is the antonym of 'concord'?", optionA: "Discord" },
-            { question: "What is a synonym for 'groundbreaking'?", optionA: "Momentous" },
-            { question: "What is the synonym of 'scot-free'?", optionA: "Unpunished" },
-            { question: "What is a synonym for 'scathing'?", optionA: "Scornful" },
-            { question: "What is the antonym of 'rob'?", optionA: "Give" },
-            { question: "What does 'on cloud nine' mean?", optionA: "Extremely happy" },
-            { question: "What does the idiom 'break ground' mean?", optionA: "To initiate a new project" },
-            { question: "What does the idiom 'bandy words' mean?", optionA: "To argue or exchange words" },
-            { question: "What is the antonym of 'sartorial'?", optionA: "Homespun" },
-            { question: "A person who studies the origin and history of words?", optionA: "Etymologist" },
-            { question: "A writing that is unclear or difficult to read?", optionA: "Illegible" },
-            { question: "ChatGPT is built on which architecture model?", optionA: "Transformer" },
-            { question: "What can Natural Language Processing (NLP) do in language processing?", optionA: "Text-to-speech conversion or Speech recognition" },
-            { question: "What is the role of META AI in business?", optionA: "All of these" },
-            { question: "In which of the following areas can DeepSeek be applied?", optionA: "All of these" },
-            { question: "How do you apply themes in MS PowerPoint?", optionA: "Design tab > Theme" },
-            { question: "From which tab can a header and footer be added in MS Word?", optionA: "Insert Tab" },
-            { question: "How do you add comments in MS Word?", optionA: "Review tab" },
-            { question: "What is the IF function in Excel used for?", optionA: "Logical comparisons" },
-            { question: "By default, how many worksheets are there in Excel?", optionA: "3" },
-            { question: "Which app is used for applying for a domicile?", optionA: "E-Khidmat App" },
-            { question: "Which is the most used app for money transfers in Punjab?", optionA: "JazzCash" },
-            { question: "Which platform does Pakistan use for international remittances?", optionA: "Western Union" },
-            { question: "Which app is used to book railway tickets in Pakistan?", optionA: "Pakistan Railways" },
-            { question: "What is the purpose of the E-Pay app?", optionA: "Tax & utility bill payment" },
-            { question: "What type of licenses does the E-Construction platform issue?", optionA: "Building Permits" },
-            { question: "Which app provides home delivery of government services?", optionA: "Dastak App" }
-        ];
+        const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
+        let currentPageIndex = 0;
 
-        let currentQuestion = 0;
-        let answers = [];
-        const totalQuestions = questions.length;
-
-        // Start Quiz
-        function startQuiz() {
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('quiz').style.display = 'block';
-            loadQuestion();
-        }
-
-        // Load Current Question
-        function loadQuestion() {
-            const q = questions[currentQuestion];
-            document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
-            document.getElementById('question').textContent = q.question;
-            document.querySelector('.option[data-choice="A"]').textContent = `A. ${q.optionA}`;
-            document.querySelector('.option[data-choice="B"]').textContent = 'B. Wrong Answer';
-            document.querySelector('.option[data-choice="C"]').textContent = 'C. Unsure or Not Attempted';
-
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById('next-btn').disabled = true;
-
-            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-            document.getElementById('progress').style.width = `${progress}%`;
-        }
-
-        // Handle Option Selection
-        document.querySelectorAll('.option').forEach(opt => {
-            opt.addEventListener('click', () => {
-                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                document.getElementById('next-btn').disabled = false;
-            });
-        });
-
-        // Handle Next Button
-        document.getElementById('next-btn').addEventListener('click', () => {
-            const selected = document.querySelector('.option.selected');
-            if (selected) {
-                answers[currentQuestion] = selected.dataset.choice;
-                currentQuestion++;
-                if (currentQuestion < totalQuestions) {
-                    loadQuestion();
+        function showPage(index) {
+            pages.forEach((pageId, i) => {
+                const page = document.getElementById(pageId);
+                if (i === index) {
+                    page.classList.add('active');
                 } else {
-                    showResults();
+                    page.classList.remove('active');
                 }
-            }
-        });
-
-        // Show Results
-        function showResults() {
-            document.getElementById('quiz').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
-
-            const correct = answers.filter(a => a === 'A').length;
-            const wrong = answers.filter(a => a === 'B').length;
-            const unsure = answers.filter(a => a === 'C').length;
-            const score = correct * 1 - wrong * 0.25;
-
-            document.getElementById('total').textContent = totalQuestions;
-            document.getElementById('correct').textContent = correct;
-            document.getElementById('wrong').textContent = wrong;
-            document.getElementById('unsure').textContent = unsure;
-            document.getElementById('score').textContent = score.toFixed(2);
+            });
         }
 
-        // Event Listeners
-        document.getElementById('start-btn').addEventListener('click', startQuiz);
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            currentQuestion = 0;
-            answers = [];
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('welcome').style.display = 'block';
-        });
+        function nextPage() {
+            if (currentPageIndex < pages.length - 1) {
+                currentPageIndex++;
+                showPage(currentPageIndex);
+            }
+        }
+
+        // Initialize the first page
+        showPage(currentPageIndex);
     </script>
 </body>
 </html>
