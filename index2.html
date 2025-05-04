@@ -1,0 +1,519 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punjab Enforcement and Regulation Act 2024 MCQ Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .container.active {
+            display: block;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 1.6em;
+        }
+        p, ul {
+            color: #2c3e50;
+        }
+        ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        .social-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .social-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        .welcome {
+            text-align: center;
+        }
+        .welcome h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+        }
+        .welcome h2 {
+            font-size: 2em;
+            color: #34495e;
+            border: none;
+            margin: 10px 0;
+        }
+        .welcome p {
+            font-size: 1.3em;
+            color: #34495e;
+        }
+        .final-message {
+            text-align: center;
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        .nav-button {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-button button {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s ease;
+            margin: 0 10px;
+        }
+        .nav-button button:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+        }
+        .nav-button button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .mcq-options {
+            margin: 25px 0;
+        }
+        .mcq-options label {
+            display: block;
+            margin: 15px 0;
+            padding: 10px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .mcq-options label:hover {
+            background: #dfe6e9;
+        }
+        .mcq-options input {
+            margin-right: 10px;
+        }
+        .correct-option {
+            background: #2ecc71 !important;
+            color: #fff;
+        }
+        .incorrect-option {
+            background: #e74c3c !important;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page 1: Welcome Page -->
+    <div class="container active" id="page1">
+        <div class="welcome">
+            <h1>Punjab Enforcement and Regulation Act 2024</h1>
+            <h2>PERA Act Quiz</h2>
+            <p>Authored by: <strong>Adv. Wajid Ali Kharal</strong></p>
+            <p><a class="social-link" href="https://m.facebook.com/WaK1997" target="_blank">Follow on Facebook</a></p>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- Page 2: MCQ 1 -->
+    <div class="container" id="page2">
+        <h2>Who hears the first appeal under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q1" value="District Coordination Officer" onchange="checkAnswer('q1', this.value)"> District Coordination Officer</label>
+            <label><input type="radio" name="q1" value="Enforcement Officer" onchange="checkAnswer('q1', this.value)"> Enforcement Officer</label>
+            <label><input type="radio" name="q1" value="Commissioner of the concerned Division" onchange="checkAnswer('q1', this.value)"> Commissioner of the concerned Division</label>
+            <label><input type="radio" name="q1" value="Court of Session" onchange="checkAnswer('q1', this.value)"> Court of Session</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 3: MCQ 2 -->
+    <div class="container" id="page3">
+        <h2>Who hears the second appeal under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q2" value="High Court" onchange="checkAnswer('q2', this.value)"> High Court</label>
+            <label><input type="radio" name="q2" value="Additional Deputy Commissioner" onchange="checkAnswer('q2', this.value)"> Additional Deputy Commissioner</label>
+            <label><input type="radio" name="q2" value="Commissioner" onchange="checkAnswer('q2', this.value)"> Commissioner</label>
+            <label><input type="radio" name="q2" value="Court of Session or Additional Sessions Judge" onchange="checkAnswer('q2', this.value)"> Court of Session or Additional Sessions Judge</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 4: MCQ 3 -->
+    <div class="container" id="page4">
+        <h2>Can an appeal be made beyond the Court of Session under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q3" value="Yes, to the High Court" onchange="checkAnswer('q3', this.value)"> Yes, to the High Court</label>
+            <label><input type="radio" name="q3" value="No, the Court of Session is the final appellate authority" onchange="checkAnswer('q3', this.value)"> No, the Court of Session is the final appellate authority</label>
+            <label><input type="radio" name="q3" value="Yes, to the Supreme Court" onchange="checkAnswer('q3', this.value)"> Yes, to the Supreme Court</label>
+            <label><input type="radio" name="q3" value="Only with special permission" onchange="checkAnswer('q3', this.value)"> Only with special permission</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 5: MCQ 4 -->
+    <div class="container" id="page5">
+        <h2>Which law governs the appeal mechanism in PERA-related matters?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q4" value="Pakistan Penal Code" onchange="checkAnswer('q4', this.value)"> Pakistan Penal Code</label>
+            <label><input type="radio" name="q4" value="Criminal Procedure Code" onchange="checkAnswer('q4', this.value)"> Criminal Procedure Code</label>
+            <label><input type="radio" name="q4" value="Local Government Act" onchange="checkAnswer('q4', this.value)"> Local Government Act</label>
+            <label><input type="radio" name="q4" value="PERA Act (Section 77)" onchange="checkAnswer('q4', this.value)"> PERA Act (Section 77)</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 6: MCQ 5 -->
+    <div class="container" id="page6">
+        <h2>Who is authorized to register an FIR under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q5" value="Enforcement Officer" onchange="checkAnswer('q5', this.value)"> Enforcement Officer</label>
+            <label><input type="radio" name="q5" value="Investigation Officer" onchange="checkAnswer('q5', this.value)"> Investigation Officer</label>
+            <label><input type="radio" name="q5" value="Sub Divisional Enforcement Officer" onchange="checkAnswer('q5', this.value)"> Sub Divisional Enforcement Officer</label>
+            <label><input type="radio" name="q5" value="Police Station In-Charge" onchange="checkAnswer('q5', this.value)"> Police Station In-Charge</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 7: MCQ 6 -->
+    <div class="container" id="page7">
+        <h2>What powers does Section 22(4)(f) grant to the Sub Divisional Enforcement Officer?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q6" value="Issue notices only" onchange="checkAnswer('q6', this.value)"> Issue notices only</label>
+            <label><input type="radio" name="q6" value="Arrest without warrant" onchange="checkAnswer('q6', this.value)"> Arrest without warrant</label>
+            <label><input type="radio" name="q6" value="Register FIRs and conduct investigations" onchange="checkAnswer('q6', this.value)"> Register FIRs and conduct investigations</label>
+            <label><input type="radio" name="q6" value="Prosecute cases in court" onchange="checkAnswer('q6', this.value)"> Prosecute cases in court</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 8: MCQ 7 -->
+    <div class="container" id="page8">
+        <h2>Under what circumstances can the SDEO register an FIR according to Section 49(2)?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q7" value="Only with court approval" onchange="checkAnswer('q7', this.value)"> Only with court approval</label>
+            <label><input type="radio" name="q7" value="Only upon written complaint" onchange="checkAnswer('q7', this.value)"> Only upon written complaint</label>
+            <label><input type="radio" name="q7" value="Directly or based on reports from other enforcement officers" onchange="checkAnswer('q7', this.value)"> Directly or based on reports from other enforcement officers</label>
+            <label><input type="radio" name="q7" value="After consulting the Commissioner" onchange="checkAnswer('q7', this.value)"> After consulting the Commissioner</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 9: MCQ 8 -->
+    <div class="container" id="page9">
+        <h2>Can Enforcement or Investigation Officers register FIRs under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q8" value="Yes, they can register FIRs directly" onchange="checkAnswer('q8', this.value)"> Yes, they can register FIRs directly</label>
+            <label><input type="radio" name="q8" value="No, only the Sub Divisional Enforcement Officer can register FIRs" onchange="checkAnswer('q8', this.value)"> No, only the Sub Divisional Enforcement Officer can register FIRs</label>
+            <label><input type="radio" name="q8" value="Yes, but only under supervision" onchange="checkAnswer('q8', this.value)"> Yes, but only under supervision</label>
+            <label><input type="radio" name="q8" value="Only in emergency situations" onchange="checkAnswer('q8', this.value)"> Only in emergency situations</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 10: MCQ 9 -->
+    <div class="container" id="page10">
+        <h2>Where are FIRs registered under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q9" value="Police Station" onchange="checkAnswer('q9', this.value)"> Police Station</label>
+            <label><input type="radio" name="q9" value="District Court" onchange="checkAnswer('q9', this.value)"> District Court</label>
+            <label><input type="radio" name="q9" value="Enforcement Headquarters" onchange="checkAnswer('q9', this.value)"> Enforcement Headquarters</label>
+            <label><input type="radio" name="q9" value="Enforcement Station" onchange="checkAnswer('q9', this.value)"> Enforcement Station</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 11: MCQ 10 -->
+    <div class="container" id="page11">
+        <h2>Which officers are authorized to arrest a person under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q10" value="Only Police Officers" onchange="checkAnswer('q10', this.value)"> Only Police Officers</label>
+            <label><input type="radio" name="q10" value="Only SDEO" onchange="checkAnswer('q10', this.value)"> Only SDEO</label>
+            <label><input type="radio" name="q10" value="SDEO, EO, and IO" onchange="checkAnswer('q10', this.value)"> SDEO, EO, and IO</label>
+            <label><input type="radio" name="q10" value="Magistrates" onchange="checkAnswer('q10', this.value)"> Magistrates</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 12: MCQ 11 -->
+    <div class="container" id="page12">
+        <h2>What does Section 31(1) of the PERA Act state about arrest powers?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q11" value="Only magistrates can order arrests" onchange="checkAnswer('q11', this.value)"> Only magistrates can order arrests</label>
+            <label><input type="radio" name="q11" value="Only police can arrest" onchange="checkAnswer('q11', this.value)"> Only police can arrest</label>
+            <label><input type="radio" name="q11" value="SDEO, EO, and IO can arrest for offences or obstruction" onchange="checkAnswer('q11', this.value)"> SDEO, EO, and IO can arrest for offences or obstruction</label>
+            <label><input type="radio" name="q11" value="Arrest is not allowed under PERA" onchange="checkAnswer('q11', this.value)"> Arrest is not allowed under PERA</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 13: MCQ 12 -->
+    <div class="container" id="page13">
+        <h2>Which section confirms the SDEO's authority to arrest?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q12" value="Section 49(2)" onchange="checkAnswer('q12', this.value)"> Section 49(2)</label>
+            <label><input type="radio" name="q12" value="Section 22(4)(f)" onchange="checkAnswer('q12', this.value)"> Section 22(4)(f)</label>
+            <label><input type="radio" name="q12" value="Section 26(3)(f)" onchange="checkAnswer('q12', this.value)"> Section 26(3)(f)</label>
+            <label><input type="radio" name="q12" value="Section 52(1)" onchange="checkAnswer('q12', this.value)"> Section 52(1)</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 14: MCQ 13 -->
+    <div class="container" id="page14">
+        <h2>Which section grants arrest powers to the Enforcement Officer?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q13" value="Section 22(4)(f)" onchange="checkAnswer('q13', this.value)"> Section 22(4)(f)</label>
+            <label><input type="radio" name="q13" value="Section 26(3)(f)" onchange="checkAnswer('q13', this.value)"> Section 26(3)(f)</label>
+            <label><input type="radio" name="q13" value="Section 23(4)(viii)" onchange="checkAnswer('q13', this.value)"> Section 23(4)(viii)</label>
+            <label><input type="radio" name="q13" value="Section 33" onchange="checkAnswer('q13', this.value)"> Section 33</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 15: MCQ 14 -->
+    <div class="container" id="page15">
+        <h2>Which section confirms the Investigation Officer's power to arrest?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q14" value="Section 23(4)(viii)" onchange="checkAnswer('q14', this.value)"> Section 23(4)(viii)</label>
+            <label><input type="radio" name="q14" value="Section 26(3)(f)" onchange="checkAnswer('q14', this.value)"> Section 26(3)(f)</label>
+            <label><input type="radio" name="q14" value="Section 31(1)" onchange="checkAnswer('q14', this.value)"> Section 31(1)</label>
+            <label><input type="radio" name="q14" value="Section 22(4)(f)" onchange="checkAnswer('q14', this.value)"> Section 22(4)(f)</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 16: MCQ 15 -->
+    <div class="container" id="page16">
+        <h2>What does Section 32 require after an arrest is made?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q15" value="Submit case file within 48 hours" onchange="checkAnswer('q15', this.value)"> Submit case file within 48 hours</label>
+            <label><input type="radio" name="q15" value="Produce arrested person before Commissioner" onchange="checkAnswer('q15', this.value)"> Produce arrested person before Commissioner</label>
+            <label><input type="radio" name="q15" value="Keep person in custody for 7 days" onchange="checkAnswer('q15', this.value)"> Keep person in custody for 7 days</label>
+            <label><input type="radio" name="q15" value="Present the person at the Enforcement Station and before a Magistrate within 24 hours" onchange="checkAnswer('q15', this.value)"> Present the person at the Enforcement Station and before a Magistrate within 24 hours</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 17: MCQ 16 -->
+    <div class="container" id="page17">
+        <h2>Do CrPC arrest procedures apply under the PERA Act?</h2>
+        <div class="mcq-options">
+            <label><input type="radio" name="q16" value="No, they are entirely excluded" onchange="checkAnswer('q16', this.value)"> No, they are entirely excluded</label>
+            <label><input type="radio" name="q16" value="Yes, always" onchange="checkAnswer('q16', this.value)"> Yes, always</label>
+            <label><input type="radio" name="q16" value="Yes, unless inconsistent with the PERA Act" onchange="checkAnswer('q16', this.value)"> Yes, unless inconsistent with the PERA Act</label>
+            <label><input type="radio" name="q16" value="Only when ordered by a court" onchange="checkAnswer('q16', this.value)"> Only when ordered by a court</label>
+        </div>
+        <div class="nav-button">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <!-- Page 18: Final Message with Restart Button -->
+    <div class="container" id="page18">
+        <div class="final-message">
+            <h1>Best of Luck!</h1>
+            <p>You may follow me on Facebook:</p>
+            <p><a class="social-link" href="https://m.facebook.com/WaK1997" target="_blank">https://m.facebook.com/WaK1997</a></p>
+        </div>
+        <div class="nav-button">
+            <button onclick="restartQuiz()">Restart Quiz</button>
+            <button disabled>Finish</button>
+        </div>
+    </div>
+
+    <script>
+        const pages = Array.from({ length: 18 }, (_, i) => `page${i + 1}`);
+        let currentPageIndex = 0;
+        const answers = {};
+        const correctAnswers = {
+            q1: 'Commissioner of the concerned Division',
+            q2: 'Court of Session or Additional Sessions Judge',
+            q3: 'No, the Court of Session is the final appellate authority',
+            q4: 'PERA Act (Section 77)',
+            q5: 'Sub Divisional Enforcement Officer',
+            q6: 'Register FIRs and conduct investigations',
+            q7: 'Directly or based on reports from other enforcement officers',
+            q8: 'No, only the Sub Divisional Enforcement Officer can register FIRs',
+            q9: 'Enforcement Station',
+            q10: 'SDEO, EO, and IO',
+            q11: 'SDEO, EO, and IO can arrest for offences or obstruction',
+            q12: 'Section 22(4)(f)',
+            q13: 'Section 23(4)(viii)',
+            q14: 'Section 26(3)(f)',
+            q15: 'Present the person at the Enforcement Station and before a Magistrate within 24 hours',
+            q16: 'Yes, unless inconsistent with the PERA Act'
+        };
+
+        function showPage(index) {
+            pages.forEach((pageId, i) => {
+                const page = document.getElementById(pageId);
+                if (i === index) {
+                    page.classList.add('active');
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+            // Reset option styles when navigating to a new page
+            if (index >= 1 && index <= 16) {
+                const question = `q${index}`;
+                const labels = document.querySelectorAll(`input[name="${question}"]`);
+                labels.forEach(input => {
+                    const label = input.parentElement;
+                    label.classList.remove('correct-option', 'incorrect-option');
+                });
+            }
+        }
+
+        function checkAnswer(question, selectedValue) {
+            const correctAnswer = correctAnswers[question];
+            const inputs = document.querySelectorAll(`input[name="${question}"]`);
+            inputs.forEach(input => {
+                const label = input.parentElement;
+                if (input.value === selectedValue) {
+                    if (selectedValue === correctAnswer) {
+                        label.classList.add('correct-option');
+                        label.classList.remove('incorrect-option');
+                    } else {
+                        label.classList.add('incorrect-option');
+                        label.classList.remove('correct-option');
+                    }
+                } else if (input.value === correctAnswer && selectedValue !== correctAnswer) {
+                    label.classList.add('correct-option');
+                    label.classList.remove('incorrect-option');
+                } else {
+                    label.classList.add('incorrect-option');
+                    label.classList.remove('correct-option');
+                }
+            });
+        }
+
+        function nextPage() {
+            if (currentPageIndex >= 1 && currentPageIndex <= 16) {
+                const question = `q${currentPageIndex}`;
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                if (!selectedOption) {
+                    alert('Please select an answer before proceeding.');
+                    return;
+                }
+                answers[question] = selectedOption.value;
+            }
+
+            if (currentPageIndex < pages.length - 1) {
+                currentPageIndex++;
+                showPage(currentPageIndex);
+            }
+        }
+
+        function restartQuiz() {
+            // Reset answers
+            Object.keys(answers).forEach(key => delete answers[key]);
+            // Reset page index
+            currentPageIndex = 0;
+            // Show the first page
+            showPage(currentPageIndex);
+        }
+
+        function displayScorecard() {
+            // No scorecard to display
+        }
+
+        // Initialize the first page
+        showPage(currentPageIndex);
+    </script>
+</body>
+</html>
